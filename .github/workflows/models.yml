@@ -14,7 +14,7 @@ jobs:
     env: { LOCAL_AI_MODELS: /home/runner/lai }
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v7
         with: { node-version: 22, cache: npm }
       - run: npm ci && npm run build
       - uses: actions/cache@v4
