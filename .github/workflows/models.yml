@@ -17,6 +17,6 @@ jobs:
       - uses: actions/setup-node@v5
         with: { node-version: 22, cache: npm }
       - run: npm ci && npm run build
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with: { path: /home/runner/lai, key: "model-${{ matrix.model }}-v1" }
       - run: npm run smoke -- ${{ matrix.model }}
