@@ -1,0 +1,22 @@
+name: models
+# Каждая модель каталога: загрузка с проверкой SHA-256, запуск в llama.cpp на процессоре, ответ по JSON-схеме на русском
+on:
+  workflow_dispatch:
+  push: { branches: [main], paths: [src/catalog.ts, src/llm.ts, scripts/smoke.mjs, package-lock.json, .github/workflows/models.yml] }
+permissions: { contents: read }
+jobs:
+  smoke:
+    strategy:
+      fail-fast: false
+      matrix: { model: [qwen3.5-4b, gemma-4-e4b, gigachat-3.1-lightning, qwen3.5-9b] }
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env: { LOCAL_AI_MODELS: /home/runner/lai }
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with: { node-version: 22, cache: npm }
+      - run: npm ci && npm run build
+      - uses: actions/cache@v4
+        with: { path: /home/runner/lai, key: "model-${{ matrix.model }}-v1" }
+      - run: npm run smoke -- ${{ matrix.model }}
