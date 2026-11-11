@@ -19,5 +19,5 @@
   "license": "MIT",
   "repository": { "type": "git", "url": "git+https://github.com/kozhevnikovai/local-ai.git" },
   "peerDependencies": { "node-llama-cpp": "^3.22.3" },
-  "devDependencies": { "node-llama-cpp": "^3.22.3", "@types/node": "^22.10.0", "typescript": "^5.7.0", "vitest": "^3.0.0" }
+  "devDependencies": { "node-llama-cpp": "^3.22.3", "@types/node": "^26.6.6", "typescript": "^5.7.0", "vitest": "^3.0.0" }
 }
