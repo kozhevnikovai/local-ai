@@ -2,13 +2,15 @@ name: models
 # Каждая модель каталога: загрузка с проверкой SHA-256, запуск в llama.cpp на процессоре, ответ по JSON-схеме на русском
 on:
   workflow_dispatch:
+    inputs:
+      models: { description: "JSON-список id моделей (пусто — весь основной набор)", required: false, default: "" }
   push: { branches: [main], paths: [src/catalog.ts, src/llm.ts, scripts/smoke.mjs, package-lock.json, .github/workflows/models.yml] }
 permissions: { contents: read }
 jobs:
   smoke:
     strategy:
       fail-fast: false
-      matrix: { model: [qwen3-4b, gemma-4-e4b, gigachat-3.1-lightning, gemma-4-12b] }
+      matrix: { model: "${{ fromJSON(inputs.models || '[\"qwen3-4b\",\"qwen3-14b\"]') }}" }
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env: { LOCAL_AI_MODELS: /home/runner/lai }
