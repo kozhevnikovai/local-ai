@@ -1,5 +1,11 @@
 # Изменения
 
+## 0.2.0
+
+- Каталог по итогам evals: лёгкая — Qwen3 4B Instruct, мощная — Qwen3 14B. Убраны Gemma 4 E4B и 12B, GigaChat 3.1 Lightning (ниже порога качества).
+- Для моделей, кроме Qwen, — шаблон чата, который выбирает node-llama-cpp.
+- Workflow models: можно проверить любой список моделей.
+
 ## 0.1.0
 
 - Каталог моделей «лёгкая/мощная»: Qwen3 4B Instruct, Gemma 4 E4B, GigaChat 3.1 Lightning, Gemma 4 12B.

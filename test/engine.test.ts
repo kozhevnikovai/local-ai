@@ -25,10 +25,12 @@ describe("выбор модели по железу", () => {
   const hw = (ramGb: number, gpu: string | null = null, vramGb = 0, unified = false) => ({ ramGb, cores: 8, gpu, vramGb, unified });
   it("ноутбук 8 ГБ без видеокарты → лёгкая", () => expect(recommend(hw(8)).tier).toBe("light"));
   it("ПК 16 ГБ без видеокарты → мощная", () => expect(recommend(hw(15.9)).tier).toBe("strong"));
-  it("8 ГБ ОЗУ + видеокарта 8 ГБ → мощная", () => expect(recommend(hw(8, "cuda", 8)).tier).toBe("strong"));
+  it("8 ГБ ОЗУ + видеокарта 12 ГБ → мощная", () => expect(recommend(hw(8, "cuda", 12)).tier).toBe("strong"));
+  it("8 ГБ ОЗУ + видеокарта 8 ГБ → лёгкая (14B не помещается)", () => expect(recommend(hw(8, "cuda", 8)).tier).toBe("light"));
+  it("в каталоге две модели, по одной на класс", () => expect(MODELS.map(m => m.id)).toEqual(["qwen3-4b", "qwen3-14b"]));
   it("Mac с общей памятью 8 ГБ → лёгкая (видеопамять = ОЗУ)", () => expect(recommend(hw(8, "metal", 5.3, true)).tier).toBe("light"));
   it("объясняет отказ", () => {
-    const r = fits(getModel("gemma-4-12b"), hw(8));
+    const r = fits(getModel("qwen3-14b"), hw(8));
     expect(r.ok).toBe(false);
     expect(r.why).toContain("16 ГБ");
   });

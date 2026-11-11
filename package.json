@@ -1,6 +1,6 @@
 {
   "name": "@kozhevnikovai/local-ai",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Общий движок локальных ИИ-моделей: каталог «лёгкая/мощная», выбор по железу, загрузка с докачкой и SHA-256, ответы по JSON-схеме через llama.cpp",
   "type": "module",
   "main": "dist/index.js",
