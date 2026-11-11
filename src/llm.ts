@@ -15,19 +15,24 @@ export interface LocalLLMOptions {
 }
 
 export async function loadLocalLLM(o: LocalLLMOptions): Promise<LocalLLM> {
-  const { getLlama, LlamaChatSession } = await import("node-llama-cpp");
+  const { getLlama, LlamaChatSession, QwenChatWrapper, resolveChatWrapper } = await import("node-llama-cpp");
   const gpu = (o.gpu ?? "auto") as any;
   const llama = await getLlama({ gpu: gpu === "cpu" ? false : gpu, logLevel: "error" as any });
   const model = await llama.loadModel({ modelPath: o.modelFile });
   const context = await model.createContext({ contextSize: { max: o.contextSize ?? 12288 } });
   const sequence = context.getSequence();
   const device = llama.gpu ? `GPU (${llama.gpu})` : "CPU";
-  // рассуждения модели («thinking») не нужны: ответ короткий и по схеме, а время на слабом ПК дорого
-  const budgets = { thoughtTokens: 0 };
+  // Рассуждения модели («thinking») не нужны: ответ короткий и по схеме, а время на слабом ПК дорого.
+  // Qwen: пустой блок рассуждений в шаблоне (иначе ограничение бюджета обрывает ответ на первом символе);
+  // остальным моделям — нулевой бюджет на рассуждения.
+  const base = resolveChatWrapper(model);
+  const qwen = base instanceof QwenChatWrapper;
+  const chatWrapper = qwen ? new QwenChatWrapper({ thoughts: "discourage" }) : base;
+  const extra = qwen ? {} : { budgets: { thoughtTokens: 0 } };
   const run = async (system: string, user: string, opts: Record<string, unknown>) => {
     await sequence.clearHistory();
-    const session = new LlamaChatSession({ contextSequence: sequence, systemPrompt: system, autoDisposeSequence: false });
-    try { return await session.prompt(user, { budgets, ...opts } as any); }
+    const session = new LlamaChatSession({ contextSequence: sequence, systemPrompt: system, autoDisposeSequence: false, ...(chatWrapper ? { chatWrapper } : {}) });
+    try { return await session.prompt(user, { ...extra, ...opts } as any); }
     finally { session.dispose({ disposeSequence: false }); }
   };
   return {

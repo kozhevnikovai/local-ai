@@ -26,9 +26,9 @@ const hf = (repo: string, name: string) => `${HF}/${repo}/resolve/main/${name}`;
 
 export const MODELS: LlmModel[] = [
   {
-    id: "qwen3.5-4b", tier: "light", title: "Qwen3.5 4B", vendor: "Alibaba Qwen", license: "Apache-2.0",
+    id: "qwen3-4b", tier: "light", title: "Qwen3 4B Instruct", vendor: "Alibaba Qwen", license: "Apache-2.0",
     minRamGb: 8, fitVramGb: 4, note: "Быстрая и компактная, подходит для ноутбуков",
-    file: { path: "llm/Qwen3.5-4B-Q4_K_M.gguf", url: hf("unsloth/Qwen3.5-4B-GGUF", "Qwen3.5-4B-Q4_K_M.gguf"), size: 2740937888, sha256: "00fe7986ff5f6b463e62455821146049db6f9313603938a70800d1fb69ef11a4" },
+    file: { path: "llm/qwen3-4b-instruct-2507-q4_k_m.gguf", url: hf("unsloth/Qwen3-4B-Instruct-2507-GGUF", "Qwen3-4B-Instruct-2507-Q4_K_M.gguf"), size: 2497281120, sha256: "3605803b982cb64aead44f6c1b2ae36e3acdb41d8e46c8a94c6533bc4c67e597" },
   },
   {
     id: "gemma-4-e4b", tier: "light", title: "Gemma 4 E4B", vendor: "Google", license: "Apache-2.0",
@@ -41,14 +41,14 @@ export const MODELS: LlmModel[] = [
     file: { path: "llm/GigaChat3.1-10B-A1.8B-q4_K_M.gguf", url: hf("ai-sage/GigaChat3.1-10B-A1.8B-GGUF", "GigaChat3.1-10B-A1.8B-q4_K_M.gguf"), size: 6474702976, sha256: "68a8732fb5cee04f83ebffd7924e15c534d4442c5a43d2ba9e2041fe310b8deb" },
   },
   {
-    id: "qwen3.5-9b", tier: "strong", title: "Qwen3.5 9B", vendor: "Alibaba Qwen", license: "Apache-2.0",
-    minRamGb: 16, fitVramGb: 7, note: "Самая точная; лучше всего с видеокартой",
-    file: { path: "llm/Qwen3.5-9B-Q4_K_M.gguf", url: hf("unsloth/Qwen3.5-9B-GGUF", "Qwen3.5-9B-Q4_K_M.gguf"), size: 5680522464, sha256: "03b74727a860a56338e042c4420bb3f04b2fec5734175f4cb9fa853daf52b7e8" },
+    id: "gemma-4-12b", tier: "strong", title: "Gemma 4 12B", vendor: "Google", license: "Apache-2.0",
+    minRamGb: 16, fitVramGb: 10, note: "Самая подробная; лучше всего с видеокартой от 10 ГБ",
+    file: { path: "llm/gemma-4-12b-it-Q4_K_M.gguf", url: hf("unsloth/gemma-4-12b-it-GGUF", "gemma-4-12b-it-Q4_K_M.gguf"), size: 7121861440, sha256: "0a270ec9fe6b34f4a0d33992b6135117b484ebc4766ab76b51d4ae8c457e4c42" },
   },
 ];
 
 /** Модель по умолчанию в каждом классе. Выбирается по evals продуктов; остальные доступны в настройках. */
-export const DEFAULTS: Record<Tier, string> = { light: "qwen3.5-4b", strong: "gigachat-3.1-lightning" };
+export const DEFAULTS: Record<Tier, string> = { light: "qwen3-4b", strong: "gigachat-3.1-lightning" };
 
 export function getModel(id: string): LlmModel {
   const m = MODELS.find(x => x.id === id);

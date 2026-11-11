@@ -28,7 +28,7 @@ describe("выбор модели по железу", () => {
   it("8 ГБ ОЗУ + видеокарта 8 ГБ → мощная", () => expect(recommend(hw(8, "cuda", 8)).tier).toBe("strong"));
   it("Mac с общей памятью 8 ГБ → лёгкая (видеопамять = ОЗУ)", () => expect(recommend(hw(8, "metal", 5.3, true)).tier).toBe("light"));
   it("объясняет отказ", () => {
-    const r = fits(getModel("qwen3.5-9b"), hw(8));
+    const r = fits(getModel("gemma-4-12b"), hw(8));
     expect(r.ok).toBe(false);
     expect(r.why).toContain("16 ГБ");
   });
