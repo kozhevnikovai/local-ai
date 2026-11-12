@@ -17,7 +17,12 @@ const t1 = Date.now();
 const out = await llm.json("Выпиши задачи из стенограммы встречи. Дата срока — в формате ГГГГ-ММ-ДД, год 2026.", user, schema, 400);
 const sec = (Date.now() - t1) / 1000;
 console.log(JSON.stringify(out, null, 1));
+// поток текста и остановка: модель начинает отвечать, после первых кусков — «Стоп»
+const ac = new AbortController(); let chunks = 0; let aborted = false;
+try { await llm.text("Ответь подробно.", "Перечисли 30 городов России по одному в строке.", 600, { signal: ac.signal, onText: () => { if (++chunks === 5) ac.abort(); } }); }
+catch (e) { aborted = e.name === "AbortError"; }
+console.log(`поток: ${chunks} кусков, остановка: ${aborted ? "да" : "НЕТ"}`);
 await llm.dispose();
-const ok = out.tasks?.length === 2 && out.tasks.some(t => /иван/i.test(t.owner) && t.due === "2026-12-15") && out.tasks.some(t => /анн/i.test(t.owner) && t.due === "2026-12-12");
+const ok = aborted && chunks >= 5 && chunks < 60 && out.tasks?.length === 2 && out.tasks.some(t => /иван/i.test(t.owner) && t.due === "2026-12-15") && out.tasks.some(t => /анн/i.test(t.owner) && t.due === "2026-12-12");
 console.log(`${m.title}: ${llm.device}, загрузка ${load.toFixed(1)} с, ответ ${sec.toFixed(1)} с, ${ok ? "верно" : "ОШИБКА в ответе"}`);
 if (!ok) process.exit(1);

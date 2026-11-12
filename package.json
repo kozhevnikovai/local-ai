@@ -1,12 +1,20 @@
 {
   "name": "@kozhevnikovai/local-ai",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Общий движок локальных ИИ-моделей: каталог «лёгкая/мощная», выбор по железу, загрузка с докачкой и SHA-256, ответы по JSON-схеме через llama.cpp",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["dist", "README.md", "README.en.md", "LICENSE", "CHANGELOG.md"],
-  "engines": { "node": ">=20" },
+  "files": [
+    "dist",
+    "README.md",
+    "README.en.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "prepare": "tsc -p tsconfig.json",
@@ -14,10 +22,30 @@
     "test": "vitest run",
     "smoke": "node scripts/smoke.mjs"
   },
-  "keywords": ["llm", "local", "offline", "llama.cpp", "gguf", "russian", "gigachat", "qwen", "gemma"],
+  "keywords": [
+    "llm",
+    "local",
+    "offline",
+    "llama.cpp",
+    "gguf",
+    "russian",
+    "gigachat",
+    "qwen",
+    "gemma"
+  ],
   "author": "Egor Kozhevnikov",
   "license": "MIT",
-  "repository": { "type": "git", "url": "git+https://github.com/kozhevnikovai/local-ai.git" },
-  "peerDependencies": { "node-llama-cpp": "^3.22.3" },
-  "devDependencies": { "node-llama-cpp": "^3.22.3", "@types/node": "^22.10.0", "typescript": "^5.7.0", "vitest": "^3.0.0" }
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kozhevnikovai/local-ai.git"
+  },
+  "peerDependencies": {
+    "node-llama-cpp": "^3.22.3"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "node-llama-cpp": "^3.22.3",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0"
+  }
 }

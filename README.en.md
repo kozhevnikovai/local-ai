@@ -10,6 +10,9 @@ Shared local AI model engine for [kozhevnikovai](https://github.com/kozhevnikova
 - **Hardware-based choice** — checks RAM and GPU, recommends a model and explains why; the user can override.
 - **Reliable download** — resume after interruption, free-space check, SHA-256, fallback mirror.
 - **JSON-schema answers** — llama.cpp on CPU or GPU (CUDA, Vulkan, Metal), thinking disabled, loop protection.
+- **Long texts** — `chunkText` splits a multi-hour transcript or a large document by paragraphs and sentences (with overlap), `mapReduce` processes parts in turn and merges the result.
+- **Streaming and Stop** — `onText` delivers text as it is generated, `signal` cancels the answer; concurrent calls are queued.
+- **Model removal** — `removeModel` frees disk space, including a partial download.
 - **Windows paths** — if the user name is non-Latin, models go to `C:\ProgramData\<App>`.
 
 ## Models

@@ -10,6 +10,9 @@
 - **Выбор по железу** — смотрит оперативную память и видеокарту, рекомендует модель и объясняет почему; пользователь может выбрать другую.
 - **Надёжная загрузка** — докачка после обрыва, проверка места на диске, SHA-256, запасное зеркало, если Hugging Face недоступен.
 - **Ответы по JSON-схеме** — llama.cpp на процессоре или видеокарте (CUDA, Vulkan, Metal), без «рассуждений» модели, с защитой от зацикливания.
+- **Длинные тексты** — `chunkText` режет многочасовую стенограмму или большой документ на части по абзацам и предложениям (с перекрытием), `mapReduce` разбирает части по очереди и сводит итог.
+- **Ответ «на лету» и кнопка «Стоп»** — `onText` отдаёт текст по мере генерации, `signal` останавливает ответ; одновременные вызовы встают в очередь.
+- **Удаление модели** — `removeModel` освобождает место, включая недокачанный файл.
 - **Пути на Windows** — если в имени пользователя кириллица, модели кладутся в `C:\ProgramData\<Программа>`.
 
 ## Модели
@@ -30,7 +33,7 @@ npm install github:kozhevnikovai/local-ai node-llama-cpp
 ## Пример
 
 ```ts
-import { detectHardware, recommend, downloadFiles, loadLocalLLM, appHome, modelsDir } from "@kozhevnikovai/local-ai";
+import { detectHardware, recommend, downloadFiles, loadLocalLLM, appHome, modelsDir, chunkText, mapReduce } from "@kozhevnikovai/local-ai";
 import { join } from "node:path";
 
 const dir = modelsDir(appHome("MyApp"), "MyApp");
@@ -39,6 +42,14 @@ console.log(reason);
 await downloadFiles([model.file], { dir, onProgress: e => console.log(e.done, "/", e.total) });
 const llm = await loadLocalLLM({ modelFile: join(dir, model.file.path) });
 const out = await llm.json("Выпиши задачи", "Иван, отправь отчёт до пятницы", { type: "object", properties: { tasks: { type: "array", items: { type: "string" } } }, required: ["tasks"] });
+// длинный текст по частям, ответ «на лету» с возможностью остановить
+const ac = new AbortController();
+const parts = chunkText(longTranscript, { maxChars: 12000, overlap: 400 });
+const summary = await mapReduce({
+  chunks: parts,
+  map: c => llm.text("Кратко перескажи фрагмент", c, 400, { signal: ac.signal }),
+  reduce: p => llm.text("Сведи пересказы в один", p.join("\n\n"), 800, { signal: ac.signal, onText: t => process.stdout.write(t) }),
+});
 await llm.dispose();
 ```
 
