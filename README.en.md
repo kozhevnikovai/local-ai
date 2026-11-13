@@ -1,3 +1,5 @@
+<p align="center"><img src="docs/img/cover.png" alt="local-ai" width="100%"></p>
+
 # local-ai
 
 Local AI model engine behind [Protokolist](https://github.com/kozhevnikovai/protokolist), [Tender Assistant](https://github.com/kozhevnikovai/tender-pomoshnik) and other [kozhevnikovai](https://github.com/kozhevnikovai) products. It picks a model that fits the computer, downloads it and answers by JSON schema. Works offline: the only network traffic is the one-time model download.

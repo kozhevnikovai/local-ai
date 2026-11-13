@@ -1,3 +1,5 @@
+<p align="center"><img src="docs/img/cover.png" alt="local-ai" width="100%"></p>
+
 # local-ai
 
 Движок локальных ИИ-моделей для [Протоколиста](https://github.com/kozhevnikovai/protokolist), [Тендерного помощника](https://github.com/kozhevnikovai/tender-pomoshnik) и других продуктов [kozhevnikovai](https://github.com/kozhevnikovai). Подбирает модель под компьютер, скачивает её и отвечает по JSON-схеме. Работает без интернета: в сеть уходит только одна загрузка модели.
