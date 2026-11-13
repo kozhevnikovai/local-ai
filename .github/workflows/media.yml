@@ -1,0 +1,23 @@
+name: media
+# Запись настоящего сеанса для GIF (Qwen3 4B на процессоре раннера)
+on:
+  workflow_dispatch:
+  push:
+    branches: ['media/**']
+    paths: ['.github/workflows/media.yml', 'scripts/media/**']
+permissions: { contents: read }
+jobs:
+  cast:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env: { LOCAL_AI_MODELS: /home/runner/lai }
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with: { node-version: 22, cache: npm }
+      - run: npm ci && npm run build
+      - uses: actions/cache@v6
+        with: { path: /home/runner/lai, key: "model-qwen3-4b-v1" }
+      - run: node scripts/media/demo.mjs
+      - uses: actions/upload-artifact@v7
+        with: { name: media, path: media/ }
