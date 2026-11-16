@@ -6,7 +6,7 @@ Local AI model engine behind [Protokolist](https://github.com/kozhevnikovai/prot
 
 [Русский](README.md)
 
-![Real CPU run: model choice, tasks from a transcript by JSON schema, streaming and Stop](docs/img/demo.gif)
+![Picking a model for this computer and downloading it — the first-run screen of Protokolist, built on local-ai](docs/img/demo.gif)
 
 <sub>Recorded in GitHub Actions: 4 cores, 16 GB, no GPU. Long pauses are sped up; the screen shows the real elapsed time.</sub>
 
