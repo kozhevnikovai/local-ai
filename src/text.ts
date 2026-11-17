@@ -1,6 +1,6 @@
 // Длинные тексты: деление на части по границам абзацев и предложений и разбор «по частям → итог».
 import { existsSync, rmSync } from "node:fs";
-import { join } from "node:path";
+import { modelFilePath } from "./download.js";
 import type { LlmModel } from "./catalog.js";
 
 export interface ChunkOptions {
@@ -12,7 +12,7 @@ export interface ChunkOptions {
 
 /** Делит текст на части не длиннее maxChars, стараясь резать по абзацам, затем по предложениям, затем по пробелам. */
 export function chunkText(text: string, o: ChunkOptions = {}): string[] {
-  const max = Math.max(200, o.maxChars ?? 12000);
+  const max = Math.max(200, Number.isFinite(o.maxChars) ? o.maxChars! : 12000);
   const overlap = Math.min(Math.max(0, o.overlap ?? 0), Math.floor(max / 4));
   const t = text.replace(/\r\n?/g, "\n").trim();
   if (!t) return [];
@@ -72,7 +72,8 @@ export function abortError(): Error {
 /** Удаляет файл модели (и незавершённую загрузку). Возвращает true, если было что удалять. */
 export function removeModel(dir: string, m: LlmModel): boolean {
   let removed = false;
-  for (const p of [join(dir, m.file.path), join(dir, m.file.path) + ".part"]) {
+  const file = modelFilePath(dir, m.file.path);
+  for (const p of [file, file + ".part", file + ".verified"]) {
     if (existsSync(p)) { rmSync(p, { force: true }); removed = true; }
   }
   return removed;

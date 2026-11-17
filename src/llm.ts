@@ -40,10 +40,23 @@ export async function loadLocalLLM(o: LocalLLMOptions): Promise<LocalLLM> {
   const extra = qwen ? {} : { budgets: { thoughtTokens: 0 } };
   // одна модель — один ответ за раз: параллельные вызовы встают в очередь
   let queue: Promise<unknown> = Promise.resolve();
+  let closing: Promise<void> | null = null;
   const run = (system: string, user: string, opts: Record<string, unknown>, call: CallOptions = {}) => {
-    const job = queue.then(() => runNow(system, user, opts, call));
+    if (closing) return Promise.reject(new Error("Модель выгружена"));
+    const job = queue.then(() => {
+      if (closing) throw new Error("Модель выгружена");
+      return runNow(system, user, opts, call);
+    });
     queue = job.catch(() => undefined);
-    return job;
+    if (!call.signal) return job;
+    // ожидающий в очереди запрос отменяется сразу, не дожидаясь окончания предыдущего
+    const signal = call.signal;
+    return new Promise<string>((res, rej) => {
+      const onAbort = () => rej(abortError());
+      if (signal.aborted) return onAbort();
+      signal.addEventListener("abort", onAbort, { once: true });
+      job.then(res, rej).finally(() => signal.removeEventListener("abort", onAbort));
+    });
   };
   const runNow = async (system: string, user: string, opts: Record<string, unknown>, call: CallOptions) => {
     if (call.signal?.aborted) throw abortError();
@@ -75,6 +88,13 @@ export async function loadLocalLLM(o: LocalLLMOptions): Promise<LocalLLM> {
     async text(system: string, user: string, maxTokens = 1500, call: CallOptions = {}) {
       return run(system, user, { temperature: 0.2, maxTokens, repeatPenalty: { penalty: 1.1, lastTokens: 128 } }, call);
     },
-    async dispose() { await context.dispose(); await model.dispose(); await llama.dispose(); },
+    /** Выгрузить модель: новые запросы отклоняются, текущий доводится до конца; повторный вызов безопасен */
+    dispose() {
+      closing ??= (async () => {
+        await queue;
+        await context.dispose(); await model.dispose(); await llama.dispose();
+      })();
+      return closing;
+    },
   };
 }

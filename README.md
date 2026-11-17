@@ -50,6 +50,7 @@ const llm = await loadLocalLLM({ modelFile: join(dir, model.file.path) });
 const out = await llm.json("Выпиши задачи", "Иван, отправь отчёт до пятницы", { type: "object", properties: { tasks: { type: "array", items: { type: "string" } } }, required: ["tasks"] });
 // длинный текст по частям, ответ «на лету» с возможностью остановить
 const ac = new AbortController();
+const longTranscript = "…стенограмма часовой встречи…"; // ваш длинный текст
 const parts = chunkText(longTranscript, { maxChars: 12000, overlap: 400 });
 const summary = await mapReduce({
   chunks: parts,
@@ -71,7 +72,7 @@ await llm.dispose();
 
 ## Безопасность
 
-Загружаются только https-адреса из каталога, файл с неверной SHA-256 удаляется, пути моделей не выходят за папку моделей. См. [SECURITY.md](SECURITY.md).
+Загружаются только https-адреса (и каждая переадресация — тоже https), файл с неверной SHA-256 удаляется. Уже скачанные файлы проверяет `verifyFiles`: SHA-256 считается один раз и запоминается до изменения файла. Пути моделей проверяются с учётом символических ссылок и не выходят за папку моделей. См. [SECURITY.md](SECURITY.md).
 
 ## Лицензия
 
