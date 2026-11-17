@@ -1,0 +1,27 @@
+name: release
+# Публикуете релиз в интерфейсе GitHub (тег vX.Y.Z) → тесты и публикация @kozhevnikovai/local-ai в npm.
+# Trusted Publishing (OIDC, без токена); первый выпуск — по секрету NPM_TOKEN.
+on:
+  release:
+    types: [published]
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  npm:
+    runs-on: ubuntu-latest
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: https://registry.npmjs.org
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
+      # Trusted Publishing (OIDC, без токена) — нужен npm 11.5+; первый выпуск нового пакета — по секрету NPM_TOKEN
+      - run: npm install -g npm@latest
+      - run: npm publish --access public
