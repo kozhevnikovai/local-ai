@@ -30,7 +30,12 @@ export async function detectHardware(): Promise<Hardware> {
   return base;
 }
 
-export interface Recommendation { tier: Tier; model: LlmModel; reason: string; options: { model: LlmModel; ok: boolean; why: string }[] }
+export interface Recommendation {
+  tier: Tier; model: LlmModel; reason: string;
+  /** false — компьютер ниже минимальных требований даже для лёгкой модели: перед загрузкой нужно предупредить пользователя */
+  supported: boolean;
+  options: { model: LlmModel; ok: boolean; why: string }[];
+}
 
 /** Подходит ли модель этому компьютеру и почему */
 export function fits(m: LlmModel, hw: Hardware): { ok: boolean; why: string } {
@@ -44,8 +49,11 @@ export function recommend(hw: Hardware): Recommendation {
   const strong = getModel(DEFAULTS.strong);
   const tier: Tier = fits(strong, hw).ok ? "strong" : "light";
   const model = getModel(DEFAULTS[tier]);
+  const supported = fits(model, hw).ok;
   const reason = tier === "strong"
     ? `Мощная модель: ${fits(strong, hw).why}.`
-    : `Лёгкая модель: для мощной ${fits(strong, hw).why}.`;
-  return { tier, model, reason, options: MODELS.map(m => ({ model: m, ...fits(m, hw) })) };
+    : supported
+      ? `Лёгкая модель: для мощной ${fits(strong, hw).why}.`
+      : `Компьютер ниже минимальных требований: ${fits(model, hw).why}. Модель может работать очень медленно или не запуститься.`;
+  return { tier, model, reason, supported, options: MODELS.map(m => ({ model: m, ...fits(m, hw) })) };
 }

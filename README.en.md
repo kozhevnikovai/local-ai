@@ -50,6 +50,7 @@ const llm = await loadLocalLLM({ modelFile: join(dir, model.file.path) });
 const out = await llm.json("List the tasks", "Ivan, send the report by Friday", { type: "object", properties: { tasks: { type: "array", items: { type: "string" } } }, required: ["tasks"] });
 // long text in chunks, streaming answer that can be stopped
 const ac = new AbortController();
+const longTranscript = "…a one-hour meeting transcript…"; // your long text
 const parts = chunkText(longTranscript, { maxChars: 12000, overlap: 400 });
 const summary = await mapReduce({
   chunks: parts,
@@ -71,7 +72,7 @@ await llm.dispose();
 
 ## Security
 
-Only https URLs from the catalog are downloaded, a file with a wrong SHA-256 is deleted, model paths never leave the models folder. See [SECURITY.md](SECURITY.md).
+Only https URLs are downloaded (every redirect must be https too), a file with a wrong SHA-256 is deleted. Already downloaded files are checked by `verifyFiles`: SHA-256 is computed once and cached until the file changes. Model paths are resolved through symlinks and never leave the models folder. See [SECURITY.md](SECURITY.md).
 
 ## License
 
